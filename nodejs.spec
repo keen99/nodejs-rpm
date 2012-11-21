@@ -1,8 +1,13 @@
 %define   _base node
+#define this to ${nil} to use whatever "python" is instead of "python26" etc
+#nodejs req 2.6 or 2.7
+#%define   pythonversion 26
+#%define   pythonversion 27
+%define   pythonversion %{nil}
 
 Name:          %{_base}js
 Version:       0.8.14
-Release:       1%{?dist}
+Release:       1.1%{?dist}
 Summary:       Node.js is a server-side JavaScript environment that uses an asynchronous event-driven model.
 Packager:      Kazuhisa Hara <kazuhisya@gmail.com>
 Group:         Development/Libraries
@@ -19,6 +24,10 @@ BuildRequires: make
 BuildRequires: openssl-devel
 BuildRequires: libstdc++-devel
 BuildRequires: zlib-devel
+BuildRequires: python%{pythonversion}
+
+
+
 
 %description
 Node.js is a server-side JavaScript environment that uses an asynchronous event-driven model.
@@ -50,13 +59,20 @@ if [ -z %{_node_arch} ];then
   exit 1
 fi
 
+##instead of patch, which would have to be recreated (and addresses well 
+##over 150 files) for each version, we'll just manipulate here
+echo "updating env python hashbang to use python%{pythonversion}"
+grep -lr "env python$" *|xargs sed -i 's/\(env python\)$/\1%{pythonversion}/g'
 ./configure \
     --prefix=/usr \
     --shared-openssl \
     --shared-openssl-includes=%{_includedir} \
     --shared-zlib \
     --shared-zlib-includes=%{_includedir}
-make binary %{?_smp_mflags}
+##configure doesnt provide a mechanism to override the python version
+##when it runs installers, but make does.
+make PYTHON=python%{pythonversion} binary %{?_smp_mflags}
+
 cd $RPM_SOURCE_DIR
 mv $RPM_BUILD_DIR/%{_base}-v%{version}/%{_base}-v%{version}-linux-%{_node_arch}.tar.gz .
 rm  -rf %{_base}-v%{version}
@@ -102,6 +118,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Nov 21 2012 David Raistrick <keen@icantclick.org> 0.8.14.1.1
+- tweaked spec file to support a specific version of python, required 
+  for a rhel5 environment where 2.4 is "python" and 2.6+ would be 
+  "python26" - instead of using a patch that would have to be 
+  regenerated each time.  
+- could probably use some more dynamic version logic...
 * Sun Oct 28 2012 Kazuhisa Hara <kazuhisya@gmail.com>
 - Updated to node.js version 0.8.14 by @Pitel
 * Thu Oct 18 2012 Kazuhisa Hara <kazuhisya@gmail.com>
