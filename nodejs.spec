@@ -1,8 +1,10 @@
 %define   _base node
 #define this to ${nil} to use whatever "python" is instead of "python26" etc
 #nodejs req 2.6 or 2.7
-#%define   pythonversion 26
-#%define   pythonversion 27
+#note that comments dont really work here, so you have to remove the % 
+#from the lines you dont want..
+#define   pythonversion 27
+#define   pythonversion 26
 %define   pythonversion %{nil}
 
 Name:          %{_base}js
