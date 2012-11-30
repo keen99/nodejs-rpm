@@ -120,7 +120,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Wed Nov 21 2012 David Raistrick <keen@icantclick.org> 0.8.14.1.1
+* Wed Nov 21 2012 David Raistrick <keen99@gmail.com> 0.8.14.1.1
 - tweaked spec file to support a specific version of python, required 
   for a rhel5 environment where 2.4 is "python" and 2.6+ would be 
   "python26" - instead of using a patch that would have to be 
